@@ -1,0 +1,28 @@
+# 1. Disable Directory Listing (Sabse important security step)
+# Isse browser me seedha folder open karne pe files ki list nahi dikhegi.
+Options -Indexes
+
+# 2. Block Direct Access to Sensitive Folders
+# Frontend API ko fetch karta hai (jaise /api/auth/login.php)
+# Par frontend ya user ko kabhi bhi seedha model, config ya controller files
+# view karne ki ijazat nahi honi chahiye. Isse config leak ho sakta hai.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(config|models|controllers)/ - [F,L]
+</IfModule>
+
+# 3. Block access to hidden files/folders (e.g., .env, .git, .htaccess)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 4. Optional: Enable CORS (Cross-Origin Resource Sharing)
+# Agar aapke React frontend se API blocked (CORS Error) ka mukabala karna pade
+# tabhi is line ko uncomment karein. Aksar PHP script mein headers set hote hain 
+# toh iski zaroorat nahi padti.
+#
+# Header set Access-Control-Allow-Origin "*"
+# Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+# Header set Access-Control-Allow-Headers "Content-Type, Authorization"

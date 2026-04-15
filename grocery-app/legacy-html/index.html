@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshCart - Online Grocery</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Blinkit Style Header & Navigation -->
+    <header class="blinkit-header">
+        <div class="nav-container top-nav">
+            <div class="nav-left">
+                <a href="index.html" class="logo-blinkit">
+                    FreshCart
+                </a>
+                <div class="delivery-info">
+                    <div class="delivery-time">Delivery in 10 minutes</div>
+                    <div class="delivery-location">
+                        B-45, Phase 1, New Delhi <i class="fa-solid fa-caret-down"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-bar-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search for 'milk' or 'bread'">
+            </div>
+
+            <div class="nav-right">
+                <a href="login.html" class="login-link">Login</a>
+                <a href="checkout.html" class="cart-btn-blinkit">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <div class="cart-info">
+                        <span class="cart-items" id="cart-item-count">0 items</span>
+                        <span class="cart-total" id="cart-total-price">₹0</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Sub Navigation for Categories to mimic Blinkit's quick links -->
+    <div class="categories-subnav">
+        <div class="subnav-container">
+            <a href="categories.html" class="active">All Categories</a>
+            <a href="categories.html?cat=Fruits">Fruits & Vegetables</a>
+            <a href="categories.html?cat=Dairy">Dairy & Breakfast</a>
+            <a href="categories.html?cat=Meat">Meat & Seafood</a>
+            <a href="categories.html?cat=Bakery">Bakery & Biscuits</a>
+        </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="hero fade-in">
+        <div class="hero-banner">
+            <div class="hero-content">
+                <h1>Fresh Groceries, <br><span>Delivered Fast</span></h1>
+                <p>Get the best quality fruits, vegetables, and daily essentials delivered directly to your doorstep with love.</p>
+                <a href="#products-section" class="btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">Shop Now <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></a>
+            </div>
+            <!-- Using an illustration/image placeholder for hero -->
+            <div class="hero-image" style="z-index: 1;">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=500&auto=format&fit=crop" alt="Fresh Groceries" style="border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); transform: rotate(-2deg); border: 8px solid white;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Groups section -->
+    <section class="categories" id="products-section" style="margin-bottom: 1rem;">
+    </section>
+
+    <!-- Products Grid -->
+    <section class="products" id="products-container">
+        <!-- Products will be injected dynamically by app.js -->
+    </section>
+
+    <footer style="text-align: center; padding: 3rem 1rem; color: #7f8c8d; border-top: 1px solid #eaeded; margin-top: 4rem;">
+        <p>&copy; 2026 FreshCart Grocery Store. All rights reserved.</p>
+    </footer>
+
+    <!-- App Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>

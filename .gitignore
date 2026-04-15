@@ -1,0 +1,66 @@
+# ==============================================================================
+# FRESHCART GROCERY PROJECT - .GITIGNORE
+# ==============================================================================
+# Yeh file un sabhi confidential aur auto-generated files ko ignore karti hai
+# jo GitHub par upload nahi honi chahiye (Security & Storage reasons).
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment & Confidential Variables
+# ------------------------------------------------------------------------------
+# Kisi bhi API keys, Database passwords ya JWT secrets ko GitHub pe reveal na karein.
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# ------------------------------------------------------------------------------
+# 2. Node Dependencies (Grocery App & Admin Panel)
+# ------------------------------------------------------------------------------
+# Node modules bohot heavy hote hain aur har system me locally install hote hain.
+node_modules/
+/grocery-app/node_modules/
+/grocery-admin-panel/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ------------------------------------------------------------------------------
+# 3. Build & Production Outputs
+# ------------------------------------------------------------------------------
+# Vite aur React ke production bundles. Ise wapas source code se banaya ja sakta hai.
+dist/
+dist-ssr/
+build/
+/grocery-app/dist/
+/grocery-admin-panel/dist/
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# 4. Backend Database & Uploads (PHP / MySQL)
+# ------------------------------------------------------------------------------
+# Database files, dumps ya users dwara upload ki gayi profile/product images.
+grocery-backend/uploads/
+*.sql
+*.sqlite
+
+# Agar aap database.php me direct credentials (username/password) daalte hain, 
+# toh production me jaane se pehle ideally yahan ignore lagaiye:
+# grocery-backend/config/database.php
+
+# ------------------------------------------------------------------------------
+# 5. OS & IDE Specific Files
+# ------------------------------------------------------------------------------
+# Mac/Windows ya Code Editors ki auto-generated files ka project se wasta nahi.
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

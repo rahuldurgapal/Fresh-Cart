@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - FreshCart</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Simplified Header -->
+    <header>
+        <div class="nav-container" style="justify-content: center;">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-leaf"></i> FreshCart
+            </a>
+        </div>
+    </header>
+
+    <!-- Auth Section -->
+    <main class="auth-wrapper fade-in">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Create Account</h2>
+                <p>Join us and start shopping fresh groceries</p>
+            </div>
+            
+            <form action="index.html" method="GET">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" class="form-control" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-options" style="margin-top: 2rem;">
+                    <label class="checkbox-wrap">
+                        <input type="checkbox" required>
+                        <span>I agree to the Terms & Conditions</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary btn-auth">Create Account</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Sign In</a></p>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

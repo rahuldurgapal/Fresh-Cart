@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshCart - Categories</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body style="background: #f4f6f9;">
+
+    <!-- Blinkit Style Header & Navigation -->
+    <header class="blinkit-header">
+        <div class="nav-container top-nav">
+            <div class="nav-left">
+                <a href="index.html" class="logo-blinkit">
+                    FreshCart
+                </a>
+                <div class="delivery-info">
+                    <div class="delivery-time">Delivery in 10 minutes</div>
+                    <div class="delivery-location">
+                        B-45, Phase 1, New Delhi <i class="fa-solid fa-caret-down"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="search-bar-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search for 'milk' or 'bread'">
+            </div>
+
+            <div class="nav-right">
+                <a href="login.html" class="login-link">Login</a>
+                <a href="checkout.html" class="cart-btn-blinkit">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <div class="cart-info">
+                        <span class="cart-items" id="cart-item-count">0 items</span>
+                        <span class="cart-total" id="cart-total-price">₹0</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="blinkit-layout">
+        <!-- Left Sidebar Categories -->
+        <aside class="blinkit-sidebar" id="category-sidebar">
+            <button class="sidebar-cat-btn active" data-filter="All">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3050/3050116.png" alt="All"></div>
+                <span>All Categories</span>
+            </button>
+            <button class="sidebar-cat-btn" data-filter="Fruits">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3194/3194591.png" alt="Fruits"></div>
+                <span>Fruits</span>
+            </button>
+            <button class="sidebar-cat-btn" data-filter="Vegetables">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2909/2909808.png" alt="Vegetables"></div>
+                <span>Vegetables</span>
+            </button>
+            <button class="sidebar-cat-btn" data-filter="Dairy">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3014/3014457.png" alt="Dairy"></div>
+                <span>Dairy & Eggs</span>
+            </button>
+            <button class="sidebar-cat-btn" data-filter="Bakery">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3014/3014527.png" alt="Bakery"></div>
+                <span>Bakery</span>
+            </button>
+            <button class="sidebar-cat-btn" data-filter="Meat">
+                <div class="cat-img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3143/3143645.png" alt="Meat"></div>
+                <span>Meat</span>
+            </button>
+        </aside>
+
+        <!-- Right Side Products -->
+        <main class="blinkit-main">
+            <div class="category-header-main">
+                <h2 id="current-category-title">All Categories</h2>
+            </div>
+            <div class="products" id="products-container" style="margin: 0; max-width: none; padding: 0;">
+                <!-- Dynamically injected -->
+            </div>
+        </main>
+    </div>
+
+    <!-- App Logic -->
+    <script src="js/app.js"></script>
+    <script>
+        // Set up the sidebar logic directly here or we can merge it into app.js
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebarBtns = document.querySelectorAll('.sidebar-cat-btn');
+            const titleEl = document.getElementById('current-category-title');
+            
+            sidebarBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    sidebarBtns.forEach(b => b.classList.remove('active'));
+                    
+                    const targetBtn = e.currentTarget;
+                    targetBtn.classList.add('active');
+                    
+                    const filterValue = targetBtn.getAttribute('data-filter');
+                    
+                    // Update Title
+                    titleEl.innerText = targetBtn.querySelector('span').innerText;
+                    
+                    // Filter products (using global products array from app.js)
+                    if (filterValue === 'All') {
+                        renderProducts(products);
+                    } else {
+                        const filtered = products.filter(p => p.category === filterValue);
+                        renderProducts(filtered);
+                    }
+                });
+            });
+            
+            // Check if there's a URL parameter for category
+            const urlParams = new URLSearchParams(window.location.search);
+            const catParam = urlParams.get('cat');
+            if (catParam) {
+                const targetBtn = document.querySelector(`.sidebar-cat-btn[data-filter="\${catParam}"]`);
+                if (targetBtn) {
+                    targetBtn.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

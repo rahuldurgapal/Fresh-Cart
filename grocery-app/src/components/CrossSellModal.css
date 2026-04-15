@@ -1,0 +1,132 @@
+.cross-sell-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(2px);
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.cross-sell-modal {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    border: 1px solid var(--border);
+}
+
+.slide-up-animation {
+    animation: slideUpModal 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUpModal {
+    0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--bg-color);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+.modal-header-cs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #f39c12;
+    margin-bottom: 8px;
+}
+
+.modal-header-cs h3 {
+    font-size: 1.4rem;
+    color: var(--text-dark);
+}
+
+.cs-subtitle {
+    color: var(--text-light);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+}
+
+.cs-product-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--bg-color);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+}
+
+.cs-product-card img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cs-details h4 {
+    font-size: 1.05rem;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+}
+
+.cs-details p {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+}
+
+.cs-price {
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 1.1rem;
+}
+
+.cs-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary-cs {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dark);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary-cs {
+    flex: 1.5;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+}

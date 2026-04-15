@@ -1,0 +1,260 @@
+.wrapper-details {
+    max-width: 1280px;
+    margin: 3rem auto 5rem;
+    padding: 0 24px;
+}
+
+.product-details-content {
+    display: flex;
+    gap: 4rem;
+    background: #fff;
+    border-radius: 24px;
+    padding: 3rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.03);
+    border: 1px solid #f0f0f0;
+}
+
+.details-left {
+    flex: 1;
+    max-width: 50%;
+}
+
+.image-wrapper {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #fdfdfd;
+    border: 1px solid #f0f0f0;
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+}
+
+.image-wrapper img {
+    width: 100%;
+    max-height: 450px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.image-wrapper:hover img {
+    transform: scale(1.05);
+}
+
+.details-badge {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    font-size: 1rem;
+    padding: 6px 14px;
+}
+
+.details-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.details-category {
+    color: #888;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.details-category a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.details-category a:hover {
+    color: var(--primary);
+}
+
+.details-title {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: #111;
+    margin-top: 5px;
+    line-height: 1.2;
+}
+
+.details-unit {
+    color: #666;
+    font-size: 1.15rem;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.details-pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.current-price {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #111;
+}
+
+.mrp-price {
+    font-size: 1.3rem;
+    color: #888;
+    text-decoration: line-through;
+}
+
+.discount-tag {
+    background: #fff0f0;
+    color: #e74c3c;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.tax-info {
+    color: #999;
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+.details-action {
+    margin-top: 35px;
+    padding-bottom: 35px;
+    border-bottom: 2px dashed #f0f0f0;
+}
+
+.btn-add-large {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 14px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    max-width: 350px;
+    box-shadow: 0 4px 16px rgba(46, 204, 113, 0.25);
+}
+
+.btn-add-large:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.35);
+}
+
+.product-about {
+    margin-top: 30px;
+    padding-bottom: 30px;
+    border-bottom: 2px dashed #f0f0f0;
+}
+
+.product-about h3 {
+    font-size: 1.3rem;
+    color: #222;
+    margin-bottom: 12px;
+}
+
+.product-about p {
+    color: #555;
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin-bottom: 16px;
+}
+
+.about-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.about-features li {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.about-features strong {
+    color: #333;
+}
+
+.details-description {
+    margin-top: 35px;
+}
+
+.details-description h3 {
+    font-size: 1.4rem;
+    color: #222;
+    margin-bottom: 24px;
+}
+
+.perks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.perks-list li {
+    display: flex;
+    gap: 18px;
+}
+
+.perk-icon {
+    font-size: 2rem;
+    background: #f4fbf6;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    color: var(--primary);
+}
+
+.perk-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+}
+
+.perk-text strong {
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.perk-text span {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+    .product-details-content {
+        flex-direction: column;
+        padding: 2rem 1.5rem;
+        gap: 2.5rem;
+    }
+    .details-left {
+        max-width: 100%;
+    }
+    .image-wrapper {
+        min-height: 300px;
+        padding: 2rem;
+    }
+    .btn-add-large {
+        max-width: 100%;
+    }
+    .details-title {
+        font-size: 2rem;
+    }
+    .current-price {
+        font-size: 2.2rem;
+    }
+}

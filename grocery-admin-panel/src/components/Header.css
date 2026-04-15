@@ -1,0 +1,120 @@
+.admin-header {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-main);
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  width: 300px;
+  border: 1px solid transparent;
+  transition: var(--transition-fast);
+}
+
+.header-search:focus-within {
+  border-color: var(--brand-primary);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+  color: var(--text-secondary);
+}
+
+.header-search input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.9rem;
+  width: 100%;
+  color: var(--text-primary);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.icon-btn {
+  position: relative;
+  color: var(--text-secondary);
+  transition: var(--transition-fast);
+  padding: 8px;
+  border-radius: var(--radius-full);
+}
+
+.icon-btn:hover {
+  background-color: var(--bg-main);
+  color: var(--brand-primary);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  background-color: var(--brand-danger);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+.admin-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+}
+
+.admin-profile:hover {
+  background-color: var(--bg-main);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e0e7ff;
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.profile-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}

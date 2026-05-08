@@ -25,7 +25,7 @@ if (!empty($data->user_id)) {
     $address->street_address = $data->street_address;
     $address->city           = $data->city;
     $address->zip_code       = $data->zip_code;
-    $address->phone_number   = $data->phone_number;
+    $address->delivery_phone = $data->phone_number;
 
     // Check if ID is provided for update
     if (!empty($data->id)) {

@@ -148,6 +148,11 @@ const MyOrders = () => {
                       <div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Payment</div>
                         <div style={{ fontSize: '0.88rem', color: 'var(--text-dark)' }}>{order.payment_method} · {order.payment_status}</div>
+                        {order.transaction_id && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            Txn ID: {order.transaction_id}
+                          </div>
+                        )}
                       </div>
                       {order.coupon_code && (
                         <div>

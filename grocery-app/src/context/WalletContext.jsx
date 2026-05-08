@@ -5,7 +5,7 @@ const WalletContext = createContext();
 export function WalletProvider({ children }) {
     const [balance, setBalance] = useState(() => {
         const localBalance = localStorage.getItem('freshWalletBalance');
-        // Give new users a $10.00 starting balance as a welcome bonus!
+        // Give new users a ₹10.00 starting balance as a welcome bonus!
         return localBalance ? parseFloat(localBalance) : 10.00;
     });
 

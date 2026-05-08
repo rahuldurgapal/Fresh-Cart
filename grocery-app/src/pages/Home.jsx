@@ -13,11 +13,14 @@ const FALLBACK_BANNERS = [
 const Home = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [banners, setBanners] = useState(FALLBACK_BANNERS);
 
     const fetchBanners = async () => {
         try {
-            const res  = await fetch(`${API_BASE}/api/banners/banners.php`);
+            const res  = await fetch(`${API_BASE}/api/banners/banners.php`, {
+                headers: {  }
+            });
             const data = await res.json();
             if (data.records && data.records.length > 0) {
                 const active = data.records.filter(b => b.status === 'Active');
@@ -25,7 +28,6 @@ const Home = () => {
                     setBanners(active.map(b => ({
                         title:       b.title,
                         subtitle:    b.subtitle || '',
-                        desc:        b.subtitle || 'Shop fresh products at the best prices.',
                         bg:          b.image_path
                             ? `url(${API_BASE}${b.image_path}) center/cover no-repeat`
                             : `linear-gradient(135deg, ${b.bg_color}cc, ${b.bg_color}66)`,
@@ -40,15 +42,28 @@ const Home = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(`${API_BASE}/api/products/get.php`);
+            const response = await fetch(`${API_BASE}/api/products/get.php`, {
+                headers: {  }
+            });
             const data = await response.json();
             if (data.records) setProducts(data.records);
+        } catch(e) { console.error(e); }
+    };
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(`${API_BASE}/api/categories/get.php`, {
+                headers: {  }
+            });
+            const data = await response.json();
+            if (data.records) setCategories(data.records);
         } catch(e) { console.error(e); }
     };
 
     useEffect(() => {
         fetchBanners();
         fetchProducts();
+        fetchCategories();
         const timer = setInterval(() => {
             setCurrentSlide(prev => (prev + 1) % banners.length);
         }, 4000);
@@ -62,6 +77,22 @@ const Home = () => {
         acc[cat].push(product);
         return acc;
     }, {});
+
+    const getMetaCategoryForFlat = (catName) => {
+        const clean = catName.toLowerCase();
+        if (clean.includes("vegetable") || clean.includes("fruit") || clean.includes("dairy") || clean.includes("bakery") || clean.includes("egg")) return "Grocery & Kitchen";
+        if (clean.includes("snack") || clean.includes("drink") || clean.includes("juice") || clean.includes("sweet") || clean.includes("chocolate") || clean.includes("chip")) return "Snacks & Drinks";
+        if (clean.includes("meat") || clean.includes("chicken") || clean.includes("fish")) return "Meat & Seafood";
+        if (clean.includes("beauty") || clean.includes("care") || clean.includes("groom")) return "Beauty & Personal Care";
+        return "Household & Essentials";
+    };
+
+    const metaGroupedCategories = {};
+    categories.forEach(cat => {
+        const meta = getMetaCategoryForFlat(cat.name);
+        if(!metaGroupedCategories[meta]) metaGroupedCategories[meta] = [];
+        metaGroupedCategories[meta].push(cat);
+    });
 
     const scrollContainer = (id, dir) => {
         const container = document.getElementById(`scroll-${id.replace(/\s+/g, '-')}`);
@@ -79,13 +110,12 @@ const Home = () => {
                 <div className="hero-banner" style={{ background: banners[currentSlide].bg, transition: 'background 0.5s ease', position: 'relative' }}>
                     <div className="hero-content" key={currentSlide} style={{ animation: 'fadeIn 0.5s ease' }}>
                         <h1>{banners[currentSlide].title} <br/><span style={{ color: banners[currentSlide].color }}>{banners[currentSlide].subtitle}</span></h1>
-                        <p>{banners[currentSlide].desc}</p>
-                        <a href={banners[currentSlide].button_link || '#products-section'} className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem', background: banners[currentSlide].color, display: 'inline-flex', alignItems: 'center' }}>
+                        <a href={banners[currentSlide].button_link || '#products-section'} className="btn-primary" style={{ background: banners[currentSlide].color, display: 'inline-flex', alignItems: 'center', marginTop: '10px' }}>
                             {banners[currentSlide].button_text || 'Shop Now'} <i className="fa-solid fa-arrow-right" style={{ marginLeft: '8px' }}></i>
                         </a>
                     </div>
                     
-                    <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
+                    <div style={{ position: 'absolute', bottom: '15px', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '8px' }}>
                         {banners.map((_, idx) => (
                             <button 
                                 key={idx} 
@@ -105,46 +135,58 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Shop by Category Section (Beautiful Cards) */}
+            {/* Blinkit Style Meta-Categories Grid */}
             <section style={{ maxWidth: '1280px', margin: '2rem auto 2rem', padding: '0 1rem' }} className="fade-in">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: '12px' }}>
-                    {categoriesList.map(cat => {
-                        // Picking one image from the category to act as thumbnail
-                        const catImage = grouped[cat][0].image;
-                        return (
-                            <Link to={`/categories?cat=${cat}`} key={cat} style={{ textDecoration: 'none' }}>
-                                <div className="category-card" style={{ 
-                                    background: '#fff', 
-                                    borderRadius: '12px', 
-                                    overflow: 'hidden', 
-                                    boxShadow: '0 2px 4px -1px rgba(0, 0, 0, 0.05)',
-                                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    padding: '12px',
-                                    border: '1px solid #f0f0f0'
-                                }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-3px)';
-                                    e.currentTarget.style.boxShadow = '0 6px 12px -2px rgba(0, 0, 0, 0.1)';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                    e.currentTarget.style.boxShadow = '0 2px 4px -1px rgba(0, 0, 0, 0.05)';
-                                }}
-                                >
-                                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', overflow: 'hidden', marginBottom: '8px', background: '#f8f9fa' }}>
-                                        {catImage && <img src={catImage.startsWith('http') ? catImage : `${API_BASE}${catImage}`} alt={cat} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
-                                    </div>
-                                    <span style={{ color: 'var(--text-dark)', fontWeight: 600, fontSize: '0.85rem', textAlign: 'center', lineHeight: 1.1 }}>{cat}</span>
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '2px' }}>{grouped[cat].length} Items</span>
-                                </div>
-                            </Link>
-                        );
-                    })}
-                </div>
+                {Object.entries(metaGroupedCategories).map(([metaName, subcategories]) => (
+                    <div key={metaName} style={{ marginBottom: '2.5rem' }}>
+                        <h2 style={{ fontSize: '1.4rem', color: 'var(--text-dark)', marginBottom: '1.2rem', fontWeight: 800 }}>{metaName}</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: '12px' }}>
+                            {subcategories.map(cat => {
+                                const imageUrl = cat.image_path 
+                                    ? (cat.image_path.startsWith('http') ? cat.image_path : `${API_BASE}${cat.image_path}`) 
+                                    : null;
+                                return (
+                                    <Link to={`/categories?cat=${cat.name}`} key={cat.id} style={{ textDecoration: 'none' }}>
+                                        <div className="category-card" style={{ 
+                                            background: 'var(--card-bg)', 
+                                            borderRadius: '12px', 
+                                            overflow: 'hidden', 
+                                            boxShadow: 'var(--shadow-sm)',
+                                            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            padding: '12px',
+                                            border: '1px solid var(--border)',
+                                            height: '100%'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(-3px)';
+                                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                                        }}
+                                        >
+                                            <div style={{ width: '70px', height: '70px', borderRadius: '12px', overflow: 'hidden', marginBottom: '8px', background: 'var(--bg-color)', padding: '4px' }}>
+                                                {imageUrl ? (
+                                                    <img src={imageUrl} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                                ) : (
+                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', color: '#95a5a6' }}>
+                                                        <i className="fa-solid fa-tag"></i>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <span style={{ color: 'var(--text-dark)', fontWeight: 600, fontSize: '0.8rem', textAlign: 'center', lineHeight: 1.1 }}>{cat.name}</span>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </section>
 
             {/* Trending / Grouped Products Section */}
@@ -152,12 +194,12 @@ const Home = () => {
                 <h2 style={{ fontSize: '1.75rem', color: 'var(--text-dark)', marginBottom: '1.5rem', textAlign: 'center', fontWeight: 800 }}>Explore Our Aisle</h2>
                 <div id="products-container" style={{ display: 'block' }}>
                     {Object.entries(grouped).map(([category, items]) => (
-                        <div key={category} className="category-group-section" style={{ marginBottom: '1.5rem', background: '#fff', padding: '16px', borderRadius: '16px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', border: '1px solid #f5f5f5' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '2px dashed #eee', paddingBottom: '10px' }}>
+                        <div key={category} className="category-group-section" style={{ marginBottom: '1.5rem', background: 'var(--card-bg)', padding: '16px', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '2px dashed var(--border)', paddingBottom: '10px' }}>
                                 <h3 style={{ fontSize: '1.25rem', color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <i className="fa-solid fa-basket-shopping" style={{fontSize: '1rem'}}></i> {category}
                                 </h3>
-                                <Link to={`/categories?cat=${category}`} style={{ color: 'var(--text-dark)', fontWeight: 600, fontSize: '0.85rem', background: '#f0f0f0', padding: '6px 12px', borderRadius: '20px' }}>
+                                <Link to={`/categories?cat=${category}`} style={{ color: 'var(--text-dark)', fontWeight: 600, fontSize: '0.85rem', background: 'var(--bg-color)', padding: '6px 12px', borderRadius: '20px' }}>
                                     View All <i className="fa-solid fa-angle-right" style={{marginLeft: '4px'}}></i>
                                 </Link>
                             </div>
@@ -165,7 +207,7 @@ const Home = () => {
                                 {/* Left Scroll Button */}
                                 <button 
                                     onClick={() => scrollContainer(category, 'left')}
-                                    style={{ position: 'absolute', left: '-15px', top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: '36px', height: '36px', borderRadius: '50%', background: '#fff', border: '1px solid #ddd', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', color: 'var(--text-dark)' }}
+                                    style={{ position: 'absolute', left: '-15px', top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: '36px', height: '36px', borderRadius: '50%', background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)', color: 'var(--text-dark)' }}
                                     className="hide-on-mobile"
                                 >
                                     <i className="fa-solid fa-chevron-left"></i>
@@ -182,7 +224,7 @@ const Home = () => {
                                 {/* Right Scroll Button */}
                                 <button 
                                     onClick={() => scrollContainer(category, 'right')}
-                                    style={{ position: 'absolute', right: '-15px', top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: '36px', height: '36px', borderRadius: '50%', background: '#fff', border: '1px solid #ddd', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', color: 'var(--text-dark)' }}
+                                    style={{ position: 'absolute', right: '-15px', top: '50%', transform: 'translateY(-50%)', zIndex: 10, width: '36px', height: '36px', borderRadius: '50%', background: 'var(--card-bg)', border: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-sm)', color: 'var(--text-dark)' }}
                                     className="hide-on-mobile"
                                 >
                                     <i className="fa-solid fa-chevron-right"></i>

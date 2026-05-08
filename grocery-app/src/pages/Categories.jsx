@@ -16,15 +16,23 @@ const Categories = () => {
 
     const fetchProductsAndCategories = async () => {
         try {
-            const pRes = await fetch(`${API_BASE}/api/products/get.php`);
+            const pRes = await fetch(`${API_BASE}/api/products/get.php`, {
+                headers: {  }
+            });
             const pData = await pRes.json();
             if(pData.records) setProducts(pData.records);
 
-            const cRes = await fetch(`${API_BASE}/api/categories/get.php`);
+            const cRes = await fetch(`${API_BASE}/api/categories/get.php`, {
+                headers: {  }
+            });
             const cData = await cRes.json();
             if(cData.records) {
-                const standardCats = cData.records.map(cat => ({ name: cat.name, id: cat.name, icon: '🛒' }));
-                setCategoriesList([{ name: 'All', id: 'All', icon: '🧺' }, ...standardCats]);
+                const standardCats = cData.records.map(cat => ({ 
+                    name: cat.name, 
+                    id: cat.name, 
+                    image: cat.image_path 
+                }));
+                setCategoriesList([{ name: 'All', id: 'All', image: null }, ...standardCats]);
             }
         } catch(e) { console.error(e); }
     };
@@ -78,8 +86,12 @@ const Categories = () => {
                         className={`sidebar-cat-btn ${selectedCategory === cat.id ? 'active' : ''}`}
                         onClick={() => setSelectedCategory(cat.id)}
                     >
-                        <div className="cat-img-wrap" style={{ fontSize: '1.5rem', background: '#f8f9fa' }}>
-                            {cat.icon}
+                        <div className="cat-img-wrap" style={{ width: '40px', height: '40px', background: '#f8f9fa', borderRadius: '8px', overflow: 'hidden' }}>
+                            {cat.image ? (
+                                <img src={cat.image.startsWith('http') ? cat.image : `${API_BASE}${cat.image}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            ) : (
+                                <div style={{ fontSize: '1.2rem' }}>{cat.name === 'All' ? '🧺' : '🛒'}</div>
+                            )}
                         </div>
                         <span>{cat.name}</span>
                     </button>

@@ -38,13 +38,13 @@ class Product {
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
 
-        $name        = htmlspecialchars(strip_tags($this->name));
-        $description = htmlspecialchars(strip_tags($this->description ?? ''));
-        $storage     = htmlspecialchars(strip_tags($this->storage_tips ?? ''));
-        $shelf       = htmlspecialchars(strip_tags($this->shelf_life ?? ''));
-        $ptype       = htmlspecialchars(strip_tags($this->product_type ?? ''));
+        $name        = strip_tags($this->name);
+        $description = strip_tags($this->description ?? '');
+        $storage     = strip_tags($this->storage_tips ?? '');
+        $shelf       = strip_tags($this->shelf_life ?? '');
+        $ptype       = strip_tags($this->product_type ?? '');
 
-        $unit        = htmlspecialchars(strip_tags($this->unit ?? '1 unit'));
+        $unit        = strip_tags($this->unit ?? '1 unit');
 
         $stmt->bind_param("sssssisssss",
             $name, $description, $storage, $shelf, $ptype,
@@ -60,25 +60,47 @@ class Product {
 
     // Update a product
     public function update() {
-        $query = "UPDATE " . $this->table_name . " 
-                  SET name=?, description=?, storage_tips=?, shelf_life=?, product_type=?, 
-                      category_id=?, price=?, stock=?, unit=?, status=? 
-                  WHERE id=?";
-        $stmt = $this->conn->prepare($query);
+        if (!empty($this->image_path)) {
+            $query = "UPDATE " . $this->table_name . " 
+                      SET name=?, description=?, storage_tips=?, shelf_life=?, product_type=?, 
+                          category_id=?, price=?, stock=?, unit=?, status=?, image_path=? 
+                      WHERE id=?";
+            $stmt = $this->conn->prepare($query);
 
-        $name        = htmlspecialchars(strip_tags($this->name));
-        $description = htmlspecialchars(strip_tags($this->description ?? ''));
-        $storage     = htmlspecialchars(strip_tags($this->storage_tips ?? ''));
-        $shelf       = htmlspecialchars(strip_tags($this->shelf_life ?? ''));
-        $ptype       = htmlspecialchars(strip_tags($this->product_type ?? ''));
+            $name        = strip_tags($this->name);
+            $description = strip_tags($this->description ?? '');
+            $storage     = strip_tags($this->storage_tips ?? '');
+            $shelf       = strip_tags($this->shelf_life ?? '');
+            $ptype       = strip_tags($this->product_type ?? '');
 
-        $unit        = htmlspecialchars(strip_tags($this->unit ?? '1 unit'));
+            $unit        = strip_tags($this->unit ?? '1 unit');
 
-        $stmt->bind_param("sssssissssi",
-            $name, $description, $storage, $shelf, $ptype,
-            $this->category_id, $this->price, $this->stock, $unit,
-            $this->status, $this->id
-        );
+            $stmt->bind_param("sssssisssssi",
+                $name, $description, $storage, $shelf, $ptype,
+                $this->category_id, $this->price, $this->stock, $unit,
+                $this->status, $this->image_path, $this->id
+            );
+        } else {
+            $query = "UPDATE " . $this->table_name . " 
+                      SET name=?, description=?, storage_tips=?, shelf_life=?, product_type=?, 
+                          category_id=?, price=?, stock=?, unit=?, status=? 
+                      WHERE id=?";
+            $stmt = $this->conn->prepare($query);
+
+            $name        = strip_tags($this->name);
+            $description = strip_tags($this->description ?? '');
+            $storage     = strip_tags($this->storage_tips ?? '');
+            $shelf       = strip_tags($this->shelf_life ?? '');
+            $ptype       = strip_tags($this->product_type ?? '');
+
+            $unit        = strip_tags($this->unit ?? '1 unit');
+
+            $stmt->bind_param("sssssissssi",
+                $name, $description, $storage, $shelf, $ptype,
+                $this->category_id, $this->price, $this->stock, $unit,
+                $this->status, $this->id
+            );
+        }
 
         if ($stmt->execute()) { return true; }
         return false;

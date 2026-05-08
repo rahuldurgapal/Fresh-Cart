@@ -11,6 +11,11 @@ class Database {
         return $this->jwt_secret;
     }
 
+    public function get2FactorApiKey() {
+        // Replace with your actual 2Factor.in API Key
+        return "1a0426be-4a46-11f1-9800-0200cd936042";
+    }
+
     private static $instance = null;
 
     public function getConnection() {
@@ -23,7 +28,7 @@ class Database {
                 exit;
             }
 
-            self::$instance->set_charset("utf8");
+            self::$instance->set_charset("utf8mb4");
         }
         
         $this->conn = self::$instance;

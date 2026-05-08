@@ -28,8 +28,8 @@ if (!empty($data->name) && !empty($data->category_id) && !empty($data->price)) {
         if (count($parts) === 2) {
             $ext  = explode("image/", $parts[0])[1];
             $file = uniqid() . '.' . $ext;
-            if (file_put_contents('../../uploads/' . $file, base64_decode($parts[1]))) {
-                $product->image_path = '/uploads/' . $file;
+            if (file_put_contents('../../uploads/products/' . $file, base64_decode($parts[1]))) {
+                $product->image_path = '/uploads/products/' . $file;
             }
         }
     }

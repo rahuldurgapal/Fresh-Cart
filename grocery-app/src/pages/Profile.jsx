@@ -24,6 +24,7 @@ const Profile = () => {
         email: user?.email || '',
         phone: user?.phone || ''
     });
+    const [fullProfile, setFullProfile] = useState(null);
 
     const [addresses, setAddresses] = useState([]);
     const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -67,6 +68,10 @@ const Profile = () => {
                 email: user.email || '',
                 phone: user.phone || ''
             });
+            fetch(`${API_BASE}/api/users/get_profile.php?user_id=${user.id}`)
+                .then(r => r.json())
+                .then(data => setFullProfile(data))
+                .catch(console.error);
         }
     }, [user]);
 
@@ -262,6 +267,12 @@ const Profile = () => {
                         <i className="fa-solid fa-wallet" style={{ color: '#16a34a' }}></i> Wallet <span style={{ marginLeft: 'auto', background: 'rgba(34,197,94,0.12)', color: '#16a34a', fontSize: '0.78rem', fontWeight: 700, padding: '2px 8px', borderRadius: '10px' }}>₹{balance.toFixed(0)}</span>
                     </Link>
                     <button 
+                        className={`profile-nav-btn ${activeTab === 'referral' ? 'active' : ''}`}
+                        onClick={() => { setActiveTab('referral'); setShowMobileSidebar(false); }}
+                    >
+                        <i className="fa-solid fa-gift" style={{ color: '#ec4899' }}></i> Refer & Earn
+                    </button>
+                    <button 
                         className={`profile-nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
                         onClick={() => { setActiveTab('settings'); setShowMobileSidebar(false); }}
                     >
@@ -387,11 +398,11 @@ const Profile = () => {
                                         <div>
                                             <p style={{ fontWeight: 600, marginBottom: '6px' }}>{addr.street_address}</p>
                                             <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>{addr.city}, {addr.zip_code}</p>
-                                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: '6px' }}>Phone: {addr.phone_number}</p>
+                                            <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: '6px' }}>Phone: {addr.delivery_phone}</p>
                                         </div>
                                         <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                                             <button onClick={() => {
-                                                setAddressData({ id: addr.id, street: addr.street_address, city: addr.city, zip: addr.zip_code, phone: addr.phone_number });
+                                                setAddressData({ id: addr.id, street: addr.street_address, city: addr.city, zip: addr.zip_code, phone: addr.delivery_phone });
                                                 setIsAddingAddress(true);
                                             }} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>Edit</button>
                                             <button onClick={() => handleDeleteAddress(addr.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontWeight: 600 }}>Delete</button>
@@ -472,6 +483,37 @@ const Profile = () => {
                                 </div>
                                 <button className="toggle-btn active">
                                     <div className="toggle-circle"></div>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
+                {activeTab === 'referral' && (
+                    <section className="profile-section fade-in">
+                        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                            <i className="fa-solid fa-gift" style={{ fontSize: '3rem', color: '#ec4899', marginBottom: '16px' }}></i>
+                            <h2 style={{ fontSize: '1.8rem', color: 'var(--text-dark)' }}>Invite Friends, Earn Wallet Cash!</h2>
+                            <p style={{ color: 'var(--text-light)', maxWidth: '400px', margin: '0 auto 24px', lineHeight: 1.5 }}>
+                                Share your invite code with friends. When they sign up and place their first order, both of you will get <strong style={{color: '#16a34a'}}>₹50</strong> credited to your FreshWallet!
+                            </p>
+                            
+                            <div style={{ background: '#fdf2f8', border: '1px dashed #ec4899', borderRadius: '12px', padding: '20px', display: 'inline-block' }}>
+                                <div style={{ fontSize: '0.9rem', color: '#831843', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Your Referral Code</div>
+                                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ec4899', letterSpacing: '2px' }}>
+                                    {fullProfile?.referral_code || 'GENERATING...'}
+                                </div>
+                                <button 
+                                    className="btn-primary" 
+                                    style={{ marginTop: '16px', background: 'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)', border: 'none', padding: '10px 24px' }}
+                                    onClick={() => {
+                                        if (fullProfile?.referral_code) {
+                                            navigator.clipboard.writeText(fullProfile.referral_code);
+                                            showToast('Invite code copied to clipboard!', 'success');
+                                        }
+                                    }}
+                                >
+                                    <i className="fa-regular fa-copy"></i> Copy Code
                                 </button>
                             </div>
                         </div>

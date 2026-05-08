@@ -12,7 +12,6 @@ import Home from './pages/Home';
 import Categories from './pages/Categories';
 import Checkout from './pages/Checkout';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import ProductDetails from './pages/ProductDetails';
 import Wishlist from './pages/Wishlist';
 import OrderSuccess from './pages/OrderSuccess';
@@ -52,7 +51,6 @@ function App() {
                       <Route path="/order-tracking/:id" element={<OrderTracking />} />
                       <Route path="/wallet" element={<Wallet />} />
                       <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
                       <Route path="/profile" element={<Profile />} />
                     </Routes>
                   </div>

@@ -7,6 +7,7 @@ class Order {
     public $coupon_code;
     public $payment_method;
     public $payment_status;
+    public $transaction_id;
     public $final_total;
     public $error_message;
     public $created_at;
@@ -24,12 +25,12 @@ class Order {
 
         try {
             // 1. Insert Order
-            $query = "INSERT INTO orders (user_id, address_id, coupon_code, payment_method, payment_status, final_total) 
-                      VALUES (?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO orders (user_id, address_id, coupon_code, payment_method, payment_status, transaction_id, final_total) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt  = $this->conn->prepare($query);
-            $stmt->bind_param("iisssd",
+            $stmt->bind_param("iissssd",
                 $this->user_id, $this->address_id, $this->coupon_code,
-                $this->payment_method, $this->payment_status, $this->final_total
+                $this->payment_method, $this->payment_status, $this->transaction_id, $this->final_total
             );
             $stmt->execute();
             $this->id = $this->conn->insert_id;
@@ -54,9 +55,9 @@ class Order {
                 $stock_stmt->bind_param("iii", $qty, $pid, $qty);
                 $stock_stmt->execute();
                 
-                // CRITICAL: Check if stock was actually deducted
+                // STRICT: If stock deduction failed, product is out of stock
                 if ($this->conn->affected_rows === 0) {
-                    throw new Exception("Product ID $pid is out of stock or insufficient quantity!");
+                    throw new Exception("Product ID $pid is out of stock or has insufficient quantity!");
                 }
             }
 
@@ -75,9 +76,9 @@ class Order {
         $query  = "SELECT o.*, u.name as customer_name, a.city, a.street_address,
                    (SELECT SUM(quantity) FROM order_items WHERE order_id = o.id) as total_items
                    FROM orders o
-                   JOIN users u ON o.user_id = u.id
+                   JOIN customers u ON o.user_id = u.id
                    JOIN addresses a ON o.address_id = a.id
-                   ORDER BY o.created_at DESC";
+                   ORDER BY o.id DESC";
         $result = $this->conn->query($query);
         return $result;
     }

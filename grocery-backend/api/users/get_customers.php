@@ -1,11 +1,11 @@
 <?php
 require_once '../../config/headers.php';
 require_once '../../config/database.php';
-require_once '../../models/User.php';
+require_once '../../models/Customer.php';
 
 $database = new Database();
 $db       = $database->getConnection();
-$user     = new User($db);
+$user     = new Customer($db);
 
 $result   = $user->getAllCustomers();
 $rowCount = $result->num_rows;

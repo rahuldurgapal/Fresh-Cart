@@ -14,7 +14,7 @@ $orders_result  = $db->query("SELECT COUNT(*) as total FROM orders");
 $total_orders   = $orders_result->fetch_assoc()['total'];
 
 // Total Customers
-$users_result   = $db->query("SELECT COUNT(*) as total FROM users WHERE role = 'Customer'");
+$users_result   = $db->query("SELECT COUNT(*) as total FROM customers");
 $total_customers = $users_result->fetch_assoc()['total'];
 
 // Total Products
@@ -65,7 +65,7 @@ while($row = $top_result->fetch_assoc()) {
 // Recent 5 Orders
 $recent_query = "SELECT o.id, u.name as customer_name, o.final_total, o.status, o.created_at
                  FROM orders o
-                 JOIN users u ON o.user_id = u.id
+                 JOIN customers u ON o.user_id = u.id
                  ORDER BY o.created_at DESC
                  LIMIT 5";
 $recent_result  = $db->query($recent_query);

@@ -1,15 +1,21 @@
 // =============================================
 //  CENTRAL API CONFIG — FreshCart Consumer App
 // =============================================
-// Jab local PC pe kaam karo:
-//   VITE_API_BASE = http://localhost:8000
-//
-// Jab --host se phone pe test karo:
-//   VITE_API_BASE = http://10.253.48.105:8000
-//
-// Is file ko mat chhedo — .env file se control hoga
+// Local development:   http://localhost:8000
+// Same-network mobile: http://<your-pc-ip>:8000  (auto-detected)
+// Production:          Set VITE_API_BASE in .env file
 // =============================================
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const hostname = window.location.hostname;
+
+const API_BASE = (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname.match(/^192\.168\.|^10\.|^172\.(1[6-9]|2[0-9]|3[0-1])\./)
+)
+    ? `http://${hostname}:8000`
+    : import.meta.env.VITE_API_BASE || 'http://localhost:8000';
+
+export const GOOGLE_CLIENT_ID = "PASTE_YOUR_GOOGLE_CLIENT_ID_HERE";
 
 export default API_BASE;

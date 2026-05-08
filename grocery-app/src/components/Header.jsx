@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import LocationModal from './LocationModal';
+import RecipeScannerModal from './RecipeScannerModal';
 import logo from '../assets/logo.png';
 
 import API_BASE from '../config.js';
@@ -18,8 +19,20 @@ const Header = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState('B-45, Phase 1, New Delhi');
+    const [isListening, setIsListening] = useState(false);
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
+    const [isLocationModalOpen, setIsLocationModalOpen] = useState(() => {
+        return !localStorage.getItem('userLocation');
+    });
+    const [selectedLocation, setSelectedLocation] = useState(() => {
+        return localStorage.getItem('userLocation') || 'Select Location';
+    });
+
+    useEffect(() => {
+        if (selectedLocation !== 'Select Location') {
+            localStorage.setItem('userLocation', selectedLocation);
+        }
+    }, [selectedLocation]);
     const searchRef = useRef(null);
     const navigate = useNavigate();
     const debounceRef = useRef(null);
@@ -63,6 +76,28 @@ const Header = () => {
         toggleCart();
     };
 
+    const handleVoiceSearch = () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('Voice Search is blocked. On mobile, this feature requires a secure connection (HTTPS) or localhost. Please test via ngrok for voice search on mobile.');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-IN';
+        recognition.continuous = false;
+
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setSearchQuery(transcript);
+            setIsSearchOpen(true);
+        };
+
+        recognition.start();
+    };
+
     return (
         <>
             <header className="blinkit-header">
@@ -80,12 +115,12 @@ const Header = () => {
                         </div>
                     </div>
                     
-                    <div className="search-bar-container" ref={searchRef}>
+                    <div className="search-bar-container" ref={searchRef} style={{ position: 'relative' }}>
                         <i className="fa-solid fa-magnifying-glass search-icon"></i>
                         <input 
                             type="text" 
                             className="search-input" 
-                            placeholder="Search for 'milk' or 'bread'" 
+                            placeholder={isListening ? "Listening..." : "Search for 'milk' or 'bread'"} 
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -98,7 +133,42 @@ const Header = () => {
                                     navigate(`/categories?search=${encodeURIComponent(searchQuery.trim())}`);
                                 }
                             }}
+                            style={{ paddingRight: '50px' }}
                         />
+                        <button 
+                            type="button" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setIsScannerOpen(true);
+                            }} 
+                            style={{ 
+                                position: 'absolute', right: '46px', top: '50%', transform: 'translateY(-50%)', 
+                                background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', border: 'none', cursor: 'pointer', fontSize: '1rem', 
+                                color: '#fff', borderRadius: '50%', width: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: '0 2px 8px rgba(236, 72, 153, 0.4)', zIndex: 10
+                            }}
+                            title="AI Recipe Scanner"
+                        >
+                            <i className="fa-solid fa-wand-magic-sparkles"></i>
+                        </button>
+                        <button 
+                            type="button" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleVoiceSearch();
+                            }} 
+                            style={{ 
+                                position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', 
+                                background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.3rem', 
+                                color: isListening ? '#ef4444' : 'var(--text-light)', transition: 'color 0.2s',
+                                padding: '12px', zIndex: 10, touchAction: 'manipulation'
+                            }}
+                            title="Voice Search"
+                        >
+                            <i className={`fa-solid ${isListening ? 'fa-microphone-lines fa-fade' : 'fa-microphone'}`}></i>
+                        </button>
                         {isSearchOpen && (
                             <div className="search-dropdown-results" style={{
                                 position: 'absolute', top: '100%', left: 0, right: 0, 
@@ -194,12 +264,12 @@ const Header = () => {
                                 <Link to="/my-orders" className="desktop-only" style={{ color: 'var(--text-dark)', fontSize: '0.85rem', textDecoration: 'none', padding: '5px 8px', borderRadius: '8px', background: 'var(--bg-color)', fontWeight: 500 }}>
                                     <i className="fa-solid fa-box" style={{ marginRight: '5px', color: 'var(--primary)' }}></i>Orders
                                 </Link>
-                                <Link to="/profile" className="user-profile-btn" style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--text-dark)', textDecoration: 'none' }}>
+                                <Link to="/profile" className="user-profile-btn desktop-only" style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--text-dark)', textDecoration: 'none' }}>
                                     Hi, {user.name} <i className="fa-regular fa-circle-user" style={{marginLeft: '5px', fontSize: '1.2rem', verticalAlign: 'middle'}}></i>
                                 </Link>
                             </>
                         ) : (
-                            <Link to="/login" className="login-link">Login</Link>
+                            <Link to="/login" className="login-link desktop-only">Login</Link>
                         )}
 
                         <button onClick={handleCartClick} className="cart-btn-blinkit desktop-only" style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit', position: 'relative' }}>
@@ -234,6 +304,10 @@ const Header = () => {
                 onClose={() => setIsLocationModalOpen(false)} 
                 selectedLocation={selectedLocation}
                 setSelectedLocation={setSelectedLocation}
+            />
+            <RecipeScannerModal 
+                isOpen={isScannerOpen} 
+                onClose={() => setIsScannerOpen(false)} 
             />
         </>
     );

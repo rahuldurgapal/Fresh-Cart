@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
 import Toast from '../components/Toast';
@@ -12,6 +13,8 @@ const Products = () => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all'); 
+  
+  const { globalSearchTerm } = useOutletContext() || { globalSearchTerm: '' };
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,6 +137,7 @@ const Products = () => {
           stock: parseInt(formData.stock || 0),
           unit: formData.unit,
           status: calculateStatus(formData.stock),
+          image: formData.image
         };
         const response = await fetch(`${API_BASE}/api/products/update.php`, {
           method: 'PUT',
@@ -190,7 +194,8 @@ const Products = () => {
   };
 
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const currentSearch = searchTerm || globalSearchTerm || '';
+    const matchesSearch = p.name.toLowerCase().includes(currentSearch.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || String(p.category_id) === String(selectedCategory);
     return matchesSearch && matchesCategory;
   });
@@ -265,7 +270,7 @@ const Products = () => {
                     </div>
                   </td>
                   <td><span className="cell-text">{product.category_name || product.category}</span></td>
-                  <td><span className="cell-text-bold">${Number(product.price).toFixed(2)}</span></td>
+                  <td><span className="cell-text-bold">₹{Number(product.price).toFixed(2)}</span></td>
                   <td><span className="cell-text">{product.unit || '1 unit'}</span></td>
                   <td><span className="cell-text">{product.stock} pcs</span></td>
                   <td>
@@ -361,7 +366,7 @@ const Products = () => {
 
           <div style={{ display: 'flex', gap: '16px' }}>
             <div className="form-group" style={{ flex: 1 }}>
-              <label>Price ($)</label>
+              <label>Price (₹)</label>
               <input 
                 type="number" 
                 step="0.01" 

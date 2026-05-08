@@ -6,19 +6,19 @@ class Address {
     public $street_address;
     public $city;
     public $zip_code;
-    public $phone_number;
+    public $delivery_phone;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
     public function create() {
-        $query = "INSERT INTO addresses (user_id, street_address, city, zip_code, phone_number) VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO addresses (user_id, street_address, city, zip_code, delivery_phone) VALUES (?, ?, ?, ?, ?)";
         $stmt  = $this->conn->prepare($query);
 
         $stmt->bind_param("issss",
             $this->user_id, $this->street_address,
-            $this->city, $this->zip_code, $this->phone_number
+            $this->city, $this->zip_code, $this->delivery_phone
         );
 
         if ($stmt->execute()) {
@@ -29,11 +29,11 @@ class Address {
     }
 
     public function update() {
-        $query = "UPDATE addresses SET street_address = ?, city = ?, zip_code = ?, phone_number = ? WHERE id = ? AND user_id = ?";
+        $query = "UPDATE addresses SET street_address = ?, city = ?, zip_code = ?, delivery_phone = ? WHERE id = ? AND user_id = ?";
         $stmt  = $this->conn->prepare($query);
         $stmt->bind_param("ssssii", 
             $this->street_address, $this->city, 
-            $this->zip_code, $this->phone_number, 
+            $this->zip_code, $this->delivery_phone, 
             $this->id, $this->user_id
         );
 
@@ -57,7 +57,7 @@ class Address {
             $this->street_address = $row['street_address'];
             $this->city = $row['city'];
             $this->zip_code = $row['zip_code'];
-            $this->phone_number = $row['phone_number'];
+            $this->delivery_phone = $row['delivery_phone'];
             return true;
         }
         return false;

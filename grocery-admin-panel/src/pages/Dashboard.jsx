@@ -131,7 +131,8 @@ const Dashboard = () => {
             <h3>Recent Orders</h3>
             <a href="/orders" style={{ fontSize: '0.85rem', color: '#22c55e', textDecoration: 'none' }}>View All →</a>
           </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+          <div className="table-responsive">
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Order ID', 'Customer', 'Amount', 'Status', 'Date'].map(h => (
@@ -157,6 +158,7 @@ const Dashboard = () => {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

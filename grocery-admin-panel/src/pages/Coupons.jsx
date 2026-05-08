@@ -182,8 +182,8 @@ const Coupons = () => {
                     </div>
                   </td>
                   <td><span className="cell-text">{coupon.discount_type}</span></td>
-                  <td><span className="cell-text-bold">{coupon.discount_type === 'Flat' ? `$${coupon.discount_value}` : `${coupon.discount_value}%`}</span></td>
-                  <td><span className="cell-text">${Number(coupon.min_order).toFixed(2)}</span></td>
+                  <td><span className="cell-text-bold">{coupon.discount_type === 'Flat' ? `₹${coupon.discount_value}` : `${coupon.discount_value}%`}</span></td>
+                  <td><span className="cell-text">₹{Number(coupon.min_order).toFixed(2)}</span></td>
                   <td>{getStatusBadge(coupon.status)}</td>
                   <td>
                     <div className="action-buttons">
@@ -232,7 +232,7 @@ const Coupons = () => {
               value={formData.discount_type}
               onChange={(e) => setFormData({...formData, discount_type: e.target.value})}
             >
-              <option value="Flat">Flat Amount ($)</option>
+               <option value="Flat">Flat Amount (₹)</option>
               <option value="Percentage">Percentage (%)</option>
             </select>
           </div>
@@ -252,7 +252,7 @@ const Coupons = () => {
             </div>
             
             <div className="form-group" style={{ flex: 1 }}>
-              <label>Minimum Order Amount ($)</label>
+               <label>Minimum Order Amount (₹)</label>
               <input 
                 type="number" 
                 step="0.01"

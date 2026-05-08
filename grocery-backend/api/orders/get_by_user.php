@@ -22,7 +22,7 @@ $query = "SELECT o.*, a.street_address, a.city,
           JOIN products p ON oi.product_id = p.id
           WHERE o.user_id = ?
           GROUP BY o.id
-          ORDER BY o.created_at DESC";
+          ORDER BY o.id DESC";
 
 $stmt = $db->prepare($query);
 $stmt->bind_param("i", $user_id);

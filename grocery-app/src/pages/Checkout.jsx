@@ -30,28 +30,53 @@ const Checkout = () => {
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [isAddingNewAddress, setIsAddingNewAddress] = useState(false);
 
+    const userLocationCache = localStorage.getItem('userLocation');
+    let defaultArea = '';
+    let defaultCity = '';
+    let defaultZip = '';
+
+    if (userLocationCache && userLocationCache !== 'Select Location') {
+        const parts = userLocationCache.split(',').map(p => p.trim());
+        if (parts.length >= 3) {
+            // Usually the format is "Area, City, State, Pincode" or "Area, City, Pincode"
+            const potentialZip = parts[parts.length - 1];
+            if (/\d{5,6}/.test(potentialZip)) {
+                defaultZip = potentialZip.replace(/\D/g, ''); // Extract only numbers
+                defaultCity = parts[parts.length - 3] || parts[parts.length - 2];
+                defaultArea = parts.slice(0, parts.length - 3).join(', ') || parts[0];
+            } else {
+                defaultArea = userLocationCache;
+            }
+        } else {
+            defaultArea = userLocationCache;
+        }
+    }
+
     const [addressData, setAddressData] = useState({
         type: 'Home',
         houseNo: '',
-        area: '',
-        city: '',
-        zip: '',
+        area: defaultArea,
+        city: defaultCity,
+        zip: defaultZip,
         landmark: ''
     });
     const [paymentMethod, setPaymentMethod] = useState('');
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     useEffect(() => {
         if (user) {
             fetch(`${API_BASE}/api/address/get_by_user.php?user_id=${user.id}`, {
-                headers: { 'Authorization': `Bearer ${user.token}` }
+                headers: { 
+                    'Authorization': `Bearer ${user.token}`
+                }
             })
             .then(r => r.json())
             .then(data => {
                 if (data && data.records && data.records.length > 0) {
                     setSavedAddresses(data.records);
                     setSelectedAddressId(data.records[0].id);
-                    if (!contactData.phone && data.records[0].phone_number) {
-                        setContactData(prev => ({ ...prev, phone: data.records[0].phone_number }));
+                    if (!contactData.phone && data.records[0].delivery_phone) {
+                        setContactData(prev => ({ ...prev, phone: data.records[0].delivery_phone }));
                     }
                 } else {
                     setIsAddingNewAddress(true);
@@ -64,8 +89,8 @@ const Checkout = () => {
     useEffect(() => {
         if (selectedAddressId && !isAddingNewAddress) {
             const addr = savedAddresses.find(a => a.id === selectedAddressId);
-            if (addr && addr.phone_number && !contactData.phone) {
-                setContactData(prev => ({ ...prev, phone: addr.phone_number }));
+            if (addr && addr.delivery_phone && !contactData.phone) {
+                setContactData(prev => ({ ...prev, phone: addr.delivery_phone }));
             }
         }
     }, [selectedAddressId, isAddingNewAddress, savedAddresses]);
@@ -104,7 +129,9 @@ const Checkout = () => {
         try {
             const response = await fetch(`${API_BASE}/api/coupons/validate.php`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({ code, cart_total: itemTotal })
             });
             const data = await response.json();
@@ -125,7 +152,30 @@ const Checkout = () => {
 
     const handleNextStep = (e) => {
         e.preventDefault();
+        
+        // If moving from address step, double check validation
+        if (currentStep === 2 && (isAddingNewAddress || savedAddresses.length === 0)) {
+            if (!addressData.houseNo.trim()) {
+                alert("Please enter House / Flat Number");
+                return;
+            }
+            if (!addressData.area.trim()) {
+                alert("Please enter Apartment / Area");
+                return;
+            }
+        }
+        
         setCurrentStep(prev => prev + 1);
+    };
+
+    const loadRazorpayScript = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
     };
 
     const handlePlaceOrder = async () => {
@@ -175,11 +225,80 @@ const Checkout = () => {
             }
 
             if (response.ok) {
-                 if (useWalletBalance && walletDeduction > 0) {
-                     useBalance(walletDeduction);
+                 const data = await response.json();
+                 const localOrderId = data.order_id;
+                 
+                 if (paymentMethod === 'cod') {
+                     if (useWalletBalance && walletDeduction > 0) useBalance(walletDeduction);
+                     clearCart();
+                     navigate('/order-success', { state: { orderId: localOrderId } });
+                 } else {
+                     // -- ONLINE PAYMENT VIA RAZORPAY --
+                     const res = await loadRazorpayScript();
+                     if (!res) {
+                         alert('Razorpay SDK failed to load. Are you offline?');
+                         return;
+                     }
+
+                     const rzpOrderRes = await fetch(`${API_BASE}/api/orders/create_razorpay_order.php`, {
+                         method: 'POST',
+                         headers: { 
+                             'Content-Type': 'application/json'
+                         },
+                         body: JSON.stringify({ amount: finalTotal, receipt: String(localOrderId) })
+                     });
+                     
+                     if (!rzpOrderRes.ok) {
+                         alert('Failed to initialize bank servers.');
+                         return;
+                     }
+                     const rzpOrder = await rzpOrderRes.json();
+                     
+                     var options = {
+                        "key": "rzp_test_Se4Ryctgw7fnL4", 
+                        "amount": finalTotal * 100, 
+                        "currency": "INR",
+                        "name": "FreshCart",
+                        "description": "Grocery Order #" + localOrderId,
+                        "order_id": rzpOrder.id, 
+                        "handler": async function (rzpData) {
+                            // Verify Payment Signature
+                            const verifyRes = await fetch(`${API_BASE}/api/orders/verify_payment.php`, {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    razorpay_payment_id: rzpData.razorpay_payment_id,
+                                    razorpay_order_id: rzpData.razorpay_order_id,
+                                    razorpay_signature: rzpData.razorpay_signature,
+                                    order_id: localOrderId
+                                })
+                            });
+                            
+                            if (verifyRes.ok) {
+                                if (useWalletBalance && walletDeduction > 0) useBalance(walletDeduction);
+                                clearCart();
+                                navigate('/order-success', { state: { orderId: localOrderId } });
+                            } else {
+                                alert("Security Verification Failed! Do not panic, if money was deducted it will be refunded.");
+                            }
+                        },
+                        "prefill": {
+                            "name": contactData.name,
+                            "contact": contactData.phone
+                        },
+                        "theme": {
+                            "color": "#16a34a"
+                        }
+                    };
+                    
+                    var rzp1 = new window.Razorpay(options);
+                    rzp1.on('payment.failed', function (response){
+                        alert("Payment Failed: " + response.error.description);
+                    });
+                    rzp1.open();
                  }
-                 clearCart();
-                 navigate('/order-success');
             } else {
                  const data = await response.json();
                  alert("Failed to place order: " + data.message);
@@ -188,6 +307,18 @@ const Checkout = () => {
             console.error(e);
             alert("Network Error during checkout");
         }
+    };
+
+    const handlePlaceOrderClick = async (e) => {
+        e.preventDefault();
+        if (!user) return navigate('/login');
+        if (cart.length === 0) return;
+
+        setIsProcessingPayment(true);
+        await handlePlaceOrder();
+        // We set to false immediately after returning (which happens if it fails or if Razorpay modal launches). 
+        // The modal overlay replaces the need for the button spinner.
+        setIsProcessingPayment(false); 
     };
 
 
@@ -360,11 +491,15 @@ const Checkout = () => {
                                 </label>
                             </div>
                             <button 
-                                onClick={handlePlaceOrder}
-                                disabled={cart.length === 0 || !paymentMethod}
-                                style={{ width: '100%', background: '#0c831f', color: 'white', padding: '15px', borderRadius: '12px', border: 'none', fontSize: '1.1rem', fontWeight: 700, cursor: (cart.length > 0 && paymentMethod) ? 'pointer' : 'not-allowed', opacity: (cart.length > 0 && paymentMethod) ? 1 : 0.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
+                                onClick={handlePlaceOrderClick}
+                                disabled={cart.length === 0 || !paymentMethod || isProcessingPayment}
+                                style={{ width: '100%', background: isProcessingPayment ? '#15803d' : '#0c831f', color: 'white', padding: '15px', borderRadius: '12px', border: 'none', fontSize: '1.1rem', fontWeight: 700, cursor: (cart.length > 0 && paymentMethod && !isProcessingPayment) ? 'pointer' : 'not-allowed', opacity: (cart.length > 0 && paymentMethod) ? 1 : 0.5, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
                             >
-                                Pay ₹{finalTotal.toFixed(2)} & Place Order <i className="fa-solid fa-lock"></i>
+                                {isProcessingPayment ? (
+                                    <><i className="fa-solid fa-circle-notch fa-spin"></i> Processing Secure Payment...</>
+                                ) : (
+                                    <>Pay ₹{finalTotal.toFixed(2)} & Place Order <i className="fa-solid fa-lock"></i></>
+                                )}
                             </button>
                         </div>
                     )}

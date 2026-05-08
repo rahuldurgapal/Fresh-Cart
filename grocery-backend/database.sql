@@ -19,7 +19,7 @@ CREATE TABLE addresses (
     street_address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     zip_code VARCHAR(20) NOT NULL,
-    phone_number VARCHAR(20) NOT NULL,
+    delivery_phone VARCHAR(20) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

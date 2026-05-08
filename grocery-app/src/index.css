@@ -28,15 +28,15 @@
     --primary-hover: #34d399;
     --primary-light: rgba(16, 185, 129, 0.2);
     --secondary: #064e3b;
-    --bg-color: #0c1222;
-    --card-bg: #1e293b;
-    --text-dark: #f8fafc;
-    --text-light: #94a3b8;
-    --border: #334155;
+    --bg-color: #121212;
+    --card-bg: #1c1c1c;
+    --text-dark: #f0f0f0;
+    --text-light: #a0a0a0;
+    --border: #2a2a2a;
     --shadow-sm: 0 4px 6px rgba(0,0,0,0.6);
     --shadow-md: 0 10px 25px rgba(0,0,0,0.8);
     --shadow-lg: 0 20px 30px rgba(16, 185, 129, 0.1);
-    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-bg: rgba(28, 28, 28, 0.7);
     --glass-border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -532,14 +532,24 @@ header {
         display: none;
     }
     
+    .hero {
+        margin: 1rem auto;
+        padding: 0 1rem;
+    }
+
     .hero-banner {
         flex-direction: column;
         text-align: center;
-        padding: 3rem 1.5rem;
+        padding: 1.5rem 1rem 2.5rem;
     }
     
     .hero-content h1 {
-        font-size: 2.2rem;
+        font-size: 1.6rem;
+    }
+    
+    .hero-content p {
+        font-size: 0.95rem;
+        margin-bottom: 1.2rem;
     }
     
     .auth-card {
@@ -549,8 +559,8 @@ header {
 
 /* Blinkit Style Navigation */
 .blinkit-header {
-    background: #fff;
-    border-bottom: 1px solid #f0f0f0;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -593,12 +603,12 @@ header {
 .delivery-time {
     font-size: 1.1rem;
     font-weight: 800;
-    color: #333;
+    color: var(--text-dark);
 }
 
 .delivery-location {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-light);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -619,7 +629,7 @@ header {
 .search-icon {
     position: absolute;
     left: 15px;
-    color: #666;
+    color: var(--text-light);
     font-size: 1.1rem;
 }
 
@@ -627,17 +637,18 @@ header {
     width: 100%;
     padding: 14px 14px 14px 45px;
     border-radius: 12px;
-    border: 1px solid #e8e8e8;
-    background: #f8f8f8;
+    border: 1px solid var(--border);
+    background: var(--bg-color);
+    color: var(--text-dark);
     font-size: 1rem;
     outline: none;
     transition: all 0.3s ease;
 }
 
 .search-input:focus {
-    background: #fff;
-    border-color: #ccc;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: var(--card-bg);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
 }
 
 .nav-right {
@@ -652,7 +663,7 @@ header {
 
 .login-link {
     font-size: 1.1rem;
-    color: #333;
+    color: var(--text-dark);
     text-decoration: none;
     font-weight: 500;
 }
@@ -686,8 +697,8 @@ header {
 }
 
 .categories-subnav {
-    border-bottom: 1px solid #f0f0f0;
-    background: #fff;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-bg);
     overflow-x: auto;
     position: sticky;
     top: 76px; /* Below the main header */
@@ -704,7 +715,7 @@ header {
 }
 
 .subnav-container a {
-    color: #666;
+    color: var(--text-light);
     text-decoration: none;
     font-weight: 500;
     font-size: 0.95rem;

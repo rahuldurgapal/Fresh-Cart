@@ -18,25 +18,22 @@ if (isset($_GET['id'])) {
 if (!empty($id)) {
     $category->id = $id;
 
-    // Step 1: Delete reviews linked to this category's products
-    $stmt = $db->prepare("DELETE r FROM reviews r INNER JOIN products p ON r.product_id = p.id WHERE p.category_id = ?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
+    // Check if category has any products attached
+    $check_stmt = $db->prepare("SELECT id FROM products WHERE category_id = ?");
+    $check_stmt->bind_param("i", $id);
+    $check_stmt->execute();
+    $result = $check_stmt->get_result();
 
-    // Step 2: Delete order_items linked to this category's products
-    $stmt2 = $db->prepare("DELETE oi FROM order_items oi INNER JOIN products p ON oi.product_id = p.id WHERE p.category_id = ?");
-    $stmt2->bind_param("i", $id);
-    $stmt2->execute();
+    if ($result->num_rows > 0) {
+        http_response_code(400); // Conflict / Bad Request
+        echo json_encode(array("message" => "Cannot delete category. It still contains products. Please move or delete the products first."));
+        exit;
+    }
 
-    // Step 3: Delete all products in this category
-    $stmt3 = $db->prepare("DELETE FROM products WHERE category_id = ?");
-    $stmt3->bind_param("i", $id);
-    $stmt3->execute();
-
-    // Step 4: Delete the category itself
+    // Since it's empty, we can safely delete the category itself
     if ($category->delete()) {
         http_response_code(200);
-        echo json_encode(array("message" => "Category and its products deleted successfully."));
+        echo json_encode(array("message" => "Category deleted successfully."));
     } else {
         http_response_code(503);
         echo json_encode(array("message" => "Unable to delete category."));

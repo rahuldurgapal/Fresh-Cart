@@ -88,7 +88,12 @@ const Categories = () => {
     
     if (editingId) {
       try {
-        const payload = { id: editingId, name: formData.name, status: formData.status };
+        const payload = { 
+          id: editingId, 
+          name: formData.name, 
+          status: formData.status,
+          image: formData.image 
+        };
         const response = await fetch(`${API_BASE}/api/categories/update.php`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },

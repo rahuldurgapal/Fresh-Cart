@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from './ToastContext';
+import API_BASE from '../config.js';
 
 const CartContext = createContext();
 
@@ -36,15 +37,15 @@ export function CartProvider({ children }) {
         if (!hasCrossSold && !cart.some(item => item.id === product.id)) {
             const lowerTitle = product.title.toLowerCase();
             if (lowerTitle.includes('bread') && product.id !== 11) {
-                setCrossSellItem({
+                 setCrossSellItem({
                     trigger: product.title,
-                    companion: { id: 11, title: 'Amul Butter', price: 55, unit: '100g', image: 'https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=270/app/assets/products/sliding_images/jpeg/d0831bae-a60d-44aa-a476-ebf32b8aa8bc.jpg?ts=1708591143' }
+                    companion: { id: 11, title: 'Amul Butter', price: 55, unit: '100g', image: `${API_BASE}/uploads/products/69e5061f897dd.webp` }
                 });
                 setHasCrossSold(true);
             } else if (lowerTitle.includes('milk') && product.id !== 13) {
-                setCrossSellItem({
+                 setCrossSellItem({
                     trigger: product.title,
-                    companion: { id: 13, title: 'Farm Eggs', price: 70, unit: '6 pcs', image: 'https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=70,metadata=none,w=270/app/assets/products/sliding_images/jpeg/192224d4-fb4e-4f51-b8ae-244171092a08.jpg?ts=1708591834' }
+                    companion: { id: 13, title: 'Amul Taza Milk', price: 70, unit: '1L', image: `${API_BASE}/uploads/products/69e5061620356.webp` }
                 });
                 setHasCrossSold(true);
             }

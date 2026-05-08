@@ -20,8 +20,12 @@ if (!empty($data->name)) {
         if (count($parts) === 2) {
             $ext  = explode("image/", $parts[0])[1];
             $file = uniqid() . '.' . $ext;
-            if (file_put_contents('../../uploads/' . $file, base64_decode($parts[1]))) {
-                $category->image_path = '/uploads/' . $file;
+            // Create directory if it doesn't exist
+            if (!is_dir('../../uploads/categories')) {
+                mkdir('../../uploads/categories', 0777, true);
+            }
+            if (file_put_contents('../../uploads/categories/' . $file, base64_decode($parts[1]))) {
+                $category->image_path = '/uploads/categories/' . $file;
             }
         }
     }

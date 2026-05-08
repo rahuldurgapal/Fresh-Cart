@@ -18,6 +18,7 @@ const ProductDetails = () => {
     const { showToast } = useToast();
     
     const [rating, setRating] = useState(5);
+    const [subscribing, setSubscribing] = useState(false);
     const [comment, setComment] = useState('');
     const [submittingReview, setSubmittingReview] = useState(false);
     
@@ -30,12 +31,16 @@ const ProductDetails = () => {
         const fetchProductData = async () => {
             setLoading(true);
             try {
-                const resSingle = await fetch(`${API_BASE}/api/products/get_single.php?id=${id}`);
+                const resSingle = await fetch(`${API_BASE}/api/products/get_single.php?id=${id}`, {
+                    headers: {  }
+                });
                 const dataSingle = await resSingle.json();
                 
                 if (resSingle.ok) {
                     setProduct(dataSingle);
-                    const resAll = await fetch(`${API_BASE}/api/products/get.php`);
+                    const resAll = await fetch(`${API_BASE}/api/products/get.php`, {
+                        headers: {  }
+                    });
                     const dataAll = await resAll.json();
                     
                     if (dataAll.records) {
@@ -46,7 +51,9 @@ const ProductDetails = () => {
                     }
                     
                     // 3. Fetch Reviews
-                    const resRev = await fetch(`${API_BASE}/api/reviews/get_by_product.php?product_id=${id}`);
+                    const resRev = await fetch(`${API_BASE}/api/reviews/get_by_product.php?product_id=${id}`, {
+                        headers: {  }
+                    });
                     const dataRev = await resRev.json();
                     if (dataRev.records) {
                         setReviews(dataRev.records);
@@ -130,6 +137,31 @@ const ProductDetails = () => {
         }
     };
 
+    const handleSubscribe = async () => {
+        if (!user || !user.token) {
+            showToast('Please login to subscribe.', 'error');
+            navigate('/login');
+            return;
+        }
+        setSubscribing(true);
+        try {
+            const res = await fetch(`${API_BASE}/api/subscriptions/create.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user.id, product_id: product.id, quantity: 1, frequency: 'Daily' })
+            });
+            if (res.ok) {
+                showToast('Successfully subscribed for Daily Delivery!', 'success');
+            } else {
+                showToast('Failed to create subscription.', 'error');
+            }
+        } catch(err) {
+            showToast('Network error.', 'error');
+        } finally {
+            setSubscribing(false);
+        }
+    };
+
     return (
         <div className="product-details-container wrapper-details fade-in">
             <button onClick={() => navigate(-1)} className="back-btn">
@@ -171,19 +203,30 @@ const ProductDetails = () => {
                     </div>
                     <p className="tax-info">(Inclusive of all taxes)</p>
 
-                    <div className="details-action">
-                        {cartItem ? (
-                            <div className="product-qty-controls" style={{
-                                display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--primary)', 
-                                color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold', width: '100%', maxWidth: '350px', fontSize: '1.4rem'
-                            }}>
-                                <button onClick={() => updateQuantity(product.id, -1)} style={{background:'none', border:'none', color:'white', fontSize:'1.6rem', cursor:'pointer'}}>-</button>
-                                <span>{cartItem.quantity}</span>
-                                <button onClick={() => updateQuantity(product.id, 1)} style={{background:'none', border:'none', color:'white', fontSize:'1.6rem', cursor:'pointer'}}>+</button>
-                            </div>
-                        ) : (
-                            <button className="btn-add-large" onClick={handleAdd}>Add to Cart</button>
-                        )}
+                    <div className="details-action" style={{ display: 'flex', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                            {cartItem ? (
+                                <div className="product-qty-controls" style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--primary)', 
+                                    color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 'bold', width: '100%', fontSize: '1.4rem'
+                                }}>
+                                    <button onClick={() => updateQuantity(product.id, -1)} style={{background:'none', border:'none', color:'white', fontSize:'1.6rem', cursor:'pointer'}}>-</button>
+                                    <span>{cartItem.quantity}</span>
+                                    <button onClick={() => updateQuantity(product.id, 1)} style={{background:'none', border:'none', color:'white', fontSize:'1.6rem', cursor:'pointer'}}>+</button>
+                                </div>
+                            ) : (
+                                <button className="btn-add-large" style={{ width: '100%' }} onClick={handleAdd}>Add to Cart</button>
+                            )}
+                        </div>
+                        <button 
+                            className="btn-outline" 
+                            style={{ flex: 1, borderColor: '#16a34a', color: '#16a34a', display: 'flex', gap: '8px', alignItems: 'center', justifyContent: 'center' }}
+                            onClick={handleSubscribe}
+                            disabled={subscribing}
+                        >
+                            {subscribing ? <span className="spinner"></span> : <i className="fa-solid fa-calendar-check"></i>}
+                            Subscribe Daily
+                        </button>
                     </div>
 
                     <div className="product-about">

@@ -199,3 +199,36 @@
     font-size: 1.2rem;
     margin-left: auto;
 }
+
+/* Mobile Bottom Sheet Layout */
+@media (max-width: 768px) {
+    .location-modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .location-modal-content {
+        border-radius: 24px 24px 0 0;
+        max-height: 85vh;
+        overflow-y: auto;
+        animation: slideUpModal 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    @keyframes slideUpModal {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .location-modal-header {
+        position: sticky;
+        top: 0;
+        background: var(--card-bg);
+        z-index: 10;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .location-modal-body {
+        padding: 20px 24px;
+    }
+}

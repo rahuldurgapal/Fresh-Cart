@@ -262,3 +262,26 @@
   display: flex;
   gap: 8px;
 }
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .search-input-wrapper {
+    width: 100%;
+  }
+  
+  .toolbar-filters {
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+  
+  .data-toolbar {
+    padding: 16px;
+  }
+}

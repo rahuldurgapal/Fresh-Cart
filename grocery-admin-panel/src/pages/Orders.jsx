@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Eye, Download } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 import Pagination from '../components/Pagination';
+import Modal from '../components/Modal';
+import Toast from '../components/Toast';
 import '../pages/Products.css'; // Reusing the layout and table styles
 
 import API_BASE from '../config.js';
@@ -8,6 +11,12 @@ import API_BASE from '../config.js';
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const { globalSearchTerm } = useOutletContext() || { globalSearchTerm: '' };
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +73,23 @@ const Orders = () => {
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
-  const filteredOrders = orders.filter(o => o.id.toString().includes(searchTerm) || o.customer_name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const handleViewDetails = async (orderId) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/orders/get_single.php?id=${orderId}`);
+      if(response.ok) {
+         const data = await response.json();
+         setSelectedOrderDetails(data);
+         setIsModalOpen(true);
+      } else {
+         setToast({ show: true, message: 'Failed to fetch order details', type: 'error' });
+      }
+    } catch(e) { console.error(e); }
+  };
+
+  const filteredOrders = orders.filter(o => {
+    const currentSearch = searchTerm || globalSearchTerm || '';
+    return o.id.toString().includes(currentSearch) || o.customer_name.toLowerCase().includes(currentSearch.toLowerCase());
+  });
   
   // Pagination Logic
   const totalItems = filteredOrders.length;
@@ -138,7 +163,7 @@ const Orders = () => {
                   </td>
                   <td><span className="cell-text">{new Date(order.created_at).toLocaleDateString()}</span></td>
                   <td><span className="cell-text">{order.total_items || 0}</span></td>
-                  <td><span className="cell-text-bold">${Number(order.final_total).toFixed(2)}</span></td>
+                  <td><span className="cell-text-bold">₹{Number(order.final_total).toFixed(2)}</span></td>
                   <td>
                     <select 
                       value={order.status}
@@ -155,7 +180,9 @@ const Orders = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <button className="icon-btn-small" title="View Details"><Eye size={16} /></button>
+                      <button className="icon-btn-small" title="View Details" onClick={() => handleViewDetails(order.id)}>
+                        <Eye size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -173,6 +200,66 @@ const Orders = () => {
           />
         )}
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={`Order #ORD-${selectedOrderDetails?.id || ''} Details`}>
+        {selectedOrderDetails && (
+           <div className="order-details-modal">
+             <div className="form-grid" style={{marginBottom: '20px', gap: '12px'}}>
+                <div style={{background: 'var(--bg-light)', padding: '12px', borderRadius: '8px'}}>
+                   <span style={{fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block'}}>Customer Name</span>
+                   <strong style={{fontSize: '1rem'}}>{selectedOrderDetails.customer_name}</strong>
+                   <div style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>{selectedOrderDetails.delivery_phone}</div>
+                </div>
+                <div style={{background: 'var(--bg-light)', padding: '12px', borderRadius: '8px'}}>
+                   <span style={{fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block'}}>Payment Method</span>
+                   <strong style={{fontSize: '1rem'}}>{selectedOrderDetails.payment_method}</strong>
+                   <div style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>{selectedOrderDetails.payment_status}</div>
+                   {selectedOrderDetails.transaction_id && (
+                     <div style={{fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px'}}>
+                       Txn ID: {selectedOrderDetails.transaction_id}
+                     </div>
+                   )}
+                </div>
+                <div style={{gridColumn: '1 / -1', background: 'var(--bg-light)', padding: '12px', borderRadius: '8px'}}>
+                   <span style={{fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block'}}>Shipping Address</span>
+                   <strong style={{fontSize: '1rem'}}>{selectedOrderDetails.street_address}, {selectedOrderDetails.city}, {selectedOrderDetails.zip_code}</strong>
+                </div>
+             </div>
+             
+             <h4 style={{marginBottom: '10px', fontSize: '1.1rem', color: 'var(--text-dark)'}}>Order Items</h4>
+             <div className="table-wrapper">
+             <table className="data-table">
+               <thead>
+                 <tr>
+                   <th>Item</th>
+                   <th>Qty</th>
+                   <th>Price</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {selectedOrderDetails.items && selectedOrderDetails.items.map(item => (
+                    <tr key={item.id}>
+                      <td>
+                        <div className="product-cell">
+                           {item.image_path && <img src={item.image_path.startsWith('http') ? item.image_path : `${API_BASE}${item.image_path}`} alt="product" style={{width: 32, height: 32, borderRadius: 4, objectFit: 'cover'}} />}
+                           <span>{item.product_name}</span>
+                        </div>
+                      </td>
+                      <td>{item.quantity}</td>
+                      <td><span className="cell-text-bold">₹{Number(item.price).toFixed(2)}</span></td>
+                    </tr>
+                 ))}
+               </tbody>
+             </table>
+             </div>
+             <div style={{textAlign: 'right', marginTop: '20px', fontSize: '1.2rem', padding: '16px', background: 'var(--bg-light)', borderRadius: '8px'}}>
+                <strong>Total Amount: <span style={{color: 'var(--brand-primary)'}}>₹{Number(selectedOrderDetails.final_total).toFixed(2)}</span></strong>
+             </div>
+           </div>
+        )}
+      </Modal>
+
+      {toast.show && <Toast message={toast.message} type={toast.type} onClose={() => setToast({ show: false, message: '', type: 'success' })} />}
     </div>
   );
 };

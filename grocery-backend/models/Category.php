@@ -15,7 +15,11 @@ class Category {
 
     // Read all categories
     public function readAll() {
-        $query = "SELECT * FROM " . $this->table_name . " ORDER BY created_at DESC";
+        $query = "SELECT c.*, COUNT(p.id) as count 
+                  FROM " . $this->table_name . " c 
+                  LEFT JOIN products p ON c.id = p.category_id 
+                  GROUP BY c.id 
+                  ORDER BY c.created_at DESC";
         $result = $this->conn->query($query);
         return $result;
     }
@@ -25,8 +29,8 @@ class Category {
         $query = "INSERT INTO " . $this->table_name . " (name, status, image_path) VALUES (?, ?, ?)";
         $stmt = $this->conn->prepare($query);
 
-        $name   = htmlspecialchars(strip_tags($this->name));
-        $status = htmlspecialchars(strip_tags($this->status));
+        $name   = strip_tags($this->name);
+        $status = strip_tags($this->status);
 
         $stmt->bind_param("sss", $name, $status, $this->image_path);
 
@@ -36,13 +40,23 @@ class Category {
 
     // Update a category
     public function update() {
-        $query = "UPDATE " . $this->table_name . " SET name=?, status=? WHERE id=?";
-        $stmt = $this->conn->prepare($query);
+        if (!empty($this->image_path)) {
+            $query = "UPDATE " . $this->table_name . " SET name=?, status=?, image_path=? WHERE id=?";
+            $stmt = $this->conn->prepare($query);
 
-        $name   = htmlspecialchars(strip_tags($this->name));
-        $status = htmlspecialchars(strip_tags($this->status));
+            $name   = strip_tags($this->name);
+            $status = strip_tags($this->status);
 
-        $stmt->bind_param("ssi", $name, $status, $this->id);
+            $stmt->bind_param("sssi", $name, $status, $this->image_path, $this->id);
+        } else {
+            $query = "UPDATE " . $this->table_name . " SET name=?, status=? WHERE id=?";
+            $stmt = $this->conn->prepare($query);
+
+            $name   = strip_tags($this->name);
+            $status = strip_tags($this->status);
+
+            $stmt->bind_param("ssi", $name, $status, $this->id);
+        }
 
         if ($stmt->execute()) { return true; }
         return false;

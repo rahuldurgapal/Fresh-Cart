@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Layers, Ticket, ShoppingCart, Users, BadgeCheck, Megaphone, MessageSquare, Settings, LogOut, Store, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, Layers, Ticket, ShoppingCart, Users, BadgeCheck, Megaphone, MessageSquare, Settings, LogOut, Store, Bell, X } from 'lucide-react';
 import './Sidebar.css';
 
 import API_BASE from '../config.js';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, closeSidebar }) => {
   const navigate = useNavigate();
   const [newOrdersCount, setNewOrdersCount] = useState(0);
 
@@ -48,10 +48,13 @@ const Sidebar = () => {
   const admin = JSON.parse(localStorage.getItem('admin_user') || '{}');
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-logo">
         <Store size={28} className="logo-icon" />
         <h2>FreshAdmin</h2>
+        <button className="mobile-close-btn" onClick={closeSidebar}>
+          <X size={24} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">
@@ -61,6 +64,7 @@ const Sidebar = () => {
             to={item.path}
             end={item.path === '/'}
             className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            onClick={closeSidebar}
           >
             {item.icon}
             <span>{item.name}</span>
